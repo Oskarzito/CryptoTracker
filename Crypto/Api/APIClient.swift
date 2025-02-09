@@ -17,7 +17,7 @@ enum APIError: Error {
 struct APIClient {
     
     private let url: String = "https://pro-api.coinmarketcap.com"
-    private let apiKey: String = "[API-KEY-HERE]"
+    private let apiKey: String = "c7c98e10-97e8-4660-88c0-f16d8a2a2738"
     
     static let shared = APIClient()
     

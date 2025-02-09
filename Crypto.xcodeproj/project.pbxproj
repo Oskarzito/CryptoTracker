@@ -39,11 +39,6 @@
 			path = CryptoTests;
 			sourceTree = "<group>";
 		};
-		E84F81392D517B8B00F9EA8D /* CryptoUITests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = CryptoUITests;
-			sourceTree = "<group>";
-		};
 		E84F81B42D559CD900F9EA8D /* Crypto */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = Crypto;
@@ -82,7 +77,6 @@
 			children = (
 				E84F81B42D559CD900F9EA8D /* Crypto */,
 				E84F812F2D517B8B00F9EA8D /* CryptoTests */,
-				E84F81392D517B8B00F9EA8D /* CryptoUITests */,
 				E84F811D2D517B8A00F9EA8D /* Products */,
 			);
 			sourceTree = "<group>";
@@ -158,9 +152,6 @@
 			);
 			dependencies = (
 				E84F81382D517B8B00F9EA8D /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				E84F81392D517B8B00F9EA8D /* CryptoUITests */,
 			);
 			name = CryptoUITests;
 			packageProductDependencies = (
