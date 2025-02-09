@@ -4,10 +4,13 @@ import SwiftUI
 class MainViewModel: ObservableObject {
     private var cryptoList: [Cryptocurrency] = []
     private let isDebug: Bool
+    private let favoritesRepositor = FavoritesRepository()
     
+    @Published var showFavorites: Bool = false
     @Published var isLoading: Bool = true
     @Published var searchText = ""
     @Published var selectedCurrency: String = "USD"
+    @Published var favorites: [Int: Bool] = [:]
     
     let currencies: [String] = ["USD", "SEK"]
     
@@ -18,11 +21,12 @@ class MainViewModel: ObservableObject {
     
     var filteredCurrencies: [Cryptocurrency] {
         if searchText.isEmpty {
-            return cryptoList
+            return cryptoList.filter { !showFavorites || (showFavorites && isFavorite(id: $0.id)) }
         } else {
             return cryptoList.filter { item in
                 item.name.localizedCaseInsensitiveContains(searchText)
             }
+            .filter { !showFavorites || (showFavorites && isFavorite(id: $0.id)) }
         }
     }
     
@@ -37,6 +41,7 @@ class MainViewModel: ObservableObject {
             
             try? await Task.sleep(for: .seconds(1.5))
             
+            self.favorites = self.resolveFavorites(ids: cryptoList.data.map { $0.id })
             self.cryptoList = cryptoList.data
             
             withAnimation {
@@ -47,6 +52,23 @@ class MainViewModel: ObservableObject {
                 print("Name: \(crypto.name), Symbol: \(crypto.symbol)")
             }
         }
+    }
+    
+    func isFavorite(id: Int) -> Bool {
+        favorites[id] ?? false
+    }
+    
+    func setFavorite(for id: Int, isFavorite: Bool) {
+        favoritesRepositor.setFavorite(for: id)
+        favorites[id] = isFavorite
+    }
+    
+    private func resolveFavorites(ids: [Int]) -> [Int: Bool] {
+        var favorites: [Int: Bool] = [:]
+        for id in ids {
+            favorites[id] = favoritesRepositor.isFavorite(for: id)
+        }
+        return favorites
     }
     
     static let dummyData: [Cryptocurrency] = [

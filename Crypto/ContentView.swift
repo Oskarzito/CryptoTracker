@@ -28,10 +28,43 @@ struct ContentView: View {
                     .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
                     
                     
-                    Section(header: Text("Cryptocurrencies")) {
+                    Section(header: listHeader) {
                         ForEach(mainViewModel.filteredCurrencies) { crypto in
                             NavigationLink(value: crypto) {
-                                Text("\(crypto.name) (\(crypto.symbol))")
+                                HStack {
+                                    Text("\(crypto.name) (\(crypto.symbol))")
+                                    Spacer()
+                                    if mainViewModel.isFavorite(id: crypto.id) {
+                                        Image(systemName: "star.fill")
+                                    }
+                                }
+                            }
+                            .swipeActions(edge: .leading) {
+                                // Only show "add favorite" swipe action for non-favorites
+                                if !mainViewModel.isFavorite(id: crypto.id) {
+                                    Button {
+                                        mainViewModel.setFavorite(for: crypto.id, isFavorite: true)
+                                    } label: {
+                                        Image(systemName: "star.fill")
+                                    }
+                                    .tint(Color.yellow)
+                                    
+                                } else {
+                                    EmptyView()
+                                }
+                            }
+                            .swipeActions(edge: .trailing) {
+                                // Only show "remove favorite" swipe action for favorites
+                                if mainViewModel.isFavorite(id: crypto.id) {
+                                    Button {
+                                        mainViewModel.setFavorite(for: crypto.id, isFavorite: false)
+                                    } label: {
+                                        Image(systemName: "star.slash.fill")
+                                    }
+                                    .tint(Color.red)
+                                } else {
+                                    EmptyView()
+                                }
                             }
                         }
                     }
@@ -42,12 +75,31 @@ struct ContentView: View {
                             CryptoDetailsViewModel(cryptocurrency: cryptocurrency)
                         )
                 }
+                .overlay {
+                    if mainViewModel.filteredCurrencies.isEmpty {
+                        ContentUnavailableView(
+                            "No results found",
+                            systemImage: "magnifyingglass"
+                        )
+                    }
+                }
             }
             .navigationTitle("Crypto Market")
         }
         .searchable(text: $mainViewModel.searchText)
     }
     
+    private var listHeader: some View {
+        HStack {
+            Toggle(isOn: $mainViewModel.showFavorites) {
+                Text(
+                    mainViewModel.showFavorites ? "Favorite currencies" : "All currencies")
+                .font(.headline)
+                .fontWeight(.regular)
+            }
+        }
+        .textCase(nil)
+    }
     private var loader: some View {
         ProgressView()
             .progressViewStyle(.circular)
@@ -59,5 +111,7 @@ struct ContentView: View {
 
 #Preview {
     ContentView()
-        .environmentObject(MainViewModel(cryptoList: MainViewModel.dummyData, isDebug: true))
+        .environmentObject(
+            MainViewModel(cryptoList: MainViewModel.dummyData, isDebug: true)
+        )
 }
